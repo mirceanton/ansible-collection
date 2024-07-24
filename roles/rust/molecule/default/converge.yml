@@ -1,0 +1,12 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+
+  vars_files:
+    - ../../defaults/main.yml
+
+  tasks:
+    - name: "Include mirceanton.rust"
+      ansible.builtin.include_role:
+        name: "mirceanton.rust"

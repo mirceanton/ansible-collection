@@ -1,0 +1,84 @@
+---
+- name: Set OS Type to Linux
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --ostype {{ proxmox_cloudbuntu_os_type }}"
+
+- name: Allocate CPU
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --cores {{ proxmox_cloudbuntu_cpu_cores }} --cpu {{ proxmox_cloudbuntu_cpu_type }}"
+
+- name: Allocate RAM
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --memory {{ proxmox_cloudbuntu_ram }}"
+
+- name: Set machine type
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --machine {{ proxmox_cloudbuntu_machine_type }}"
+
+- name: Assign a network interface
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --net0 {{ proxmox_cloudbuntu_net_driver }},bridge={{ proxmox_cloudbuntu_net_bridge }}"
+
+- name: Configure the network interface
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --ipconfig0 {{ proxmox_cloudbuntu_ci_ipconfig }}"
+
+- name: Set the nameserver
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --nameserver {{ proxmox_cloudbuntu_ci_nameserver }}"
+  when: proxmox_cloudbuntu_ci_nameserver is defined
+
+- name: Set the search domain
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --searchdomain  {{ proxmox_cloudbuntu_ci_searchdomain }}"
+  when: proxmox_cloudbuntu_ci_searchdomain is defined
+
+- name: Create the boot disk
+  ansible.builtin.command: "qm importdisk {{ proxmox_cloudbuntu_vmid }} {{ proxmox_cloudbuntu_image_dest }} {{ proxmox_cloudbuntu_disk_device }}"
+
+- name: Set the boot disk
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --scsihw {{ proxmox_cloudbuntu_disk_scsihw }} --scsi0 {{ proxmox_cloudbuntu_disk_device }}:vm-{{ proxmox_cloudbuntu_vmid }}-disk-0"
+
+- name: Resize the boot disk
+  ansible.builtin.command: "qm resize {{ proxmox_cloudbuntu_vmid }} scsi0 {{ proxmox_cloudbuntu_disk_size }}"
+
+- name: Create the cloudinit disk
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --ide2 {{ proxmox_cloudbuntu_disk_device }}:cloudinit"
+
+- name: Set bios type to UEFI
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --bios {{ proxmox_cloudbuntu_bios_type }} --efidisk0 {{ proxmox_cloudbuntu_disk_device }}:0"
+  when: proxmox_cloudbuntu_bios_type == "ovmf"
+
+- name: Set the boot order
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --boot c --bootdisk scsi0"
+
+- name: Create a serial terminal
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --serial0 socket --vga serial0"
+
+- name: Set the cloudinit user
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --ciuser {{ proxmox_cloudbuntu_ci_user }}"
+  when: proxmox_cloudbuntu_ci_user is defined
+
+- name: Set the cloudinit password
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --cipassword {{ proxmox_cloudbuntu_ci_pass }}"
+  when: proxmox_cloudbuntu_ci_pass is defined
+
+- name: Set the cloudinit ssh keys
+  when: proxmox_cloudbuntu_ci_keys is defined
+  block:
+    - name: Create ssh keys file
+      ansible.builtin.lineinfile:
+        path: "/tmp/{{ proxmox_cloudbuntu_vmid }}-ssh-keys"
+        line: "{{ item }}"
+        create: true
+        mode: 0777
+      loop: "{{ proxmox_cloudbuntu_ci_keys }}"
+
+    - name: Set the VM ssh keys
+      ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --sshkeys /tmp/{{ proxmox_cloudbuntu_vmid }}-ssh-keys"
+
+    - name: Remove the ssh keys file
+      ansible.builtin.file:
+        path: "/tmp/{{ proxmox_cloudbuntu_vmid }}-ssh-keys"
+        state: absent
+
+- name: Make sure qemu-guest-agent gets installed on the VM
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --cicustom 'vendor={{ proxmox_cloudbuntu_snippets_device }}:snippets/qemu-ga.yml'"
+
+- name: Enable qemu guest agent
+  ansible.builtin.command: "qm set {{ proxmox_cloudbuntu_vmid }} --agent 1"
+
+- name: Convert the VM to a template
+  ansible.builtin.command: "qm template {{ proxmox_cloudbuntu_vmid }}"

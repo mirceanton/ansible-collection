@@ -1,0 +1,21 @@
+galaxy_info:
+  author: Mircea-Pavel ANTON
+  namespace: mirceanton
+  role_name: opnsense_general
+  description: An Ansible role to configure general system settings on opnSense firewalls.
+  company: mirceanton
+
+  license: license (MIT)
+  standalone: true
+  min_ansible_version: "2.1"
+
+  platforms:
+    - name: opnSense
+      versions:
+        - 22.7
+
+  galaxy_tags:
+    - opnsense
+    - firewall
+
+dependencies: []

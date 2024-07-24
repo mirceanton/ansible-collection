@@ -1,0 +1,31 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  vars_files:
+    - ../../defaults/main.yml
+
+  pre_tasks:
+    - name: Gathering Package Facts
+      ansible.builtin.package_facts:
+    - name: Gathering Service Facts
+      ansible.builtin.service_facts:
+
+  tasks:
+    - name: Check if apt packages are installed
+      ansible.builtin.assert:
+        that: "'{{ anacron_package_name }}' in ansible_facts.packages"
+
+    - name: Get stats for the anacrontab file
+      ansible.builtin.stat:
+        path: "{{ anacron_tab_file_path }}"
+      register: __anacrontab__
+
+    - name: Validate stats
+      ansible.builtin.assert:
+        that:
+          - "__anacrontab__.stat.exists"
+          - "__anacrontab__.stat.isreg" # is a regular file
+          - "__anacrontab__.stat.path == '{{ anacron_tab_file_path }}'"
+          - "__anacrontab__.stat.mode == '0644'"

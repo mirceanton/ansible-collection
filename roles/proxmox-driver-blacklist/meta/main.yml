@@ -1,0 +1,22 @@
+galaxy_info:
+  author: Mircea-Pavel ANTON
+  namespace: mirceanton
+  role_name: proxmox_driver_blacklist
+  description: An Ansible role that configures the blacklisted drivers on a Proxmox VE host.
+  company: mirceanton
+
+  license: license (MIT)
+  standalone: true
+  min_ansible_version: "2.1"
+
+  platforms:
+    - name: Proxmox
+      versions:
+        - 7.2
+        - 7.1
+        - 6.4
+
+  galaxy_tags:
+    - proxmox
+
+dependencies: []
