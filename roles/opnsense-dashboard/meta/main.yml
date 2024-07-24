@@ -1,0 +1,22 @@
+galaxy_info:
+  author: Mircea-Pavel ANTON
+  namespace: mirceanton
+  role_name: opnsense_dashboard
+  description: An Ansible role that configures some basic settings for the opnSense dashboard.
+  company: mirceanton
+
+  license: license (MIT)
+  standalone: true
+  min_ansible_version: "2.1"
+
+  platforms:
+    - name: opnSense
+      versions:
+        - 22.7
+
+  galaxy_tags:
+    - opnsense
+    - firewall
+    - dashboard
+
+dependencies: []

@@ -1,0 +1,8 @@
+---
+area/github:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**/*"
+
+area/anbsible:
+  - changed-files:
+      - any-glob-to-any-file: "roles/**/*"

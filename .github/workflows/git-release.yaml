@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Release
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ "main" ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for npm provenance
+
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@31c86eb3b33c9b601a1f60f98dcbfd1d70f379b4 # v1.10.3
+        id: app-token
+        with:
+          app-id: "${{ secrets.BOT_APP_ID }}"
+          private-key: "${{ secrets.BOT_APP_PRIVATE_KEY }}"
+
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          token: "${{ steps.app-token.outputs.token }}"
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4.0.3
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          node-version: 22
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: "${{ steps.app-token.outputs.token }}"
+        run: |
+          npx semantic-release \
+            --plugins=@semantic-release/commit-analyzer,@semantic-release/release-notes-generator,@semantic-release/github \
+            --branches=main

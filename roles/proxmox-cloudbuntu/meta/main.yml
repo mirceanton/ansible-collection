@@ -1,0 +1,23 @@
+galaxy_info:
+  author: Mircea-Pavel ANTON
+  namespace: mirceanton
+  role_name: proxmox_cloudbuntu
+  description: An Ansible role that configures an Ubuntu VM template based on the cloud image with support for cloudinit on a Proxmox VE host
+  company: mirceanton
+
+  standalone: true
+
+  issue_tracker_url: https://github.com/Amir-Homelab/ansible-role_proxmox-cloud-vm-template/issues
+  license: license (MIT)
+
+  min_ansible_version: "2.1"
+
+  platforms:
+    - name: Proxmox VE
+      versions:
+        - 7.2
+
+  galaxy_tags:
+    - proxmox
+
+dependencies: []

@@ -1,0 +1,36 @@
+galaxy_info:
+  author: Mircea-Pavel ANTON
+  namespace: mirceanton
+  role_name: proxmox_vgpu
+  description: An Ansible role that configures Nvidia vGPU on a Proxmox VE host.
+  company: mirceanton
+
+  license: license (MIT)
+  standalone: true
+  min_ansible_version: "2.1"
+
+  platforms:
+    - name: Proxmox VE
+      versions:
+        - 7.3
+        - 7.2
+
+  galaxy_tags:
+    - proxmox
+    - nvidia
+    - vgpu
+    - virtualization
+    - gpu
+    - vdi
+
+dependencies:
+  - role: mirceanton.proxmox_no_subscription
+    version: v2.0.0
+  - role: mirceanton.proxmox_iommu
+    version: v1.0.2
+  - role: mirceanton.proxmox_vfio
+    version: v1.0.0
+  - role: mirceanton.proxmox_driver_blacklist
+    version: v1.0.0
+  - role: mirceanton.rust
+    version: v1.0.0
