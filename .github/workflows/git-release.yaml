@@ -11,7 +11,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for npm provenance
 
     steps:
       - name: Generate Token
@@ -26,33 +29,12 @@ jobs:
         with:
           token: "${{ steps.app-token.outputs.token }}"
 
-      - name: Create Release
-        shell: bash
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+
+      - name: Release
         env:
-          GH_TOKEN: "${{ steps.app-token.outputs.token }}"
-        run: |
-          # Retrieve previous release tag
-          previous_tag="$(gh release list --limit 1 | awk '{ print $1 }')"
-
-          # Extract major, minor and patch from tag
-          previous_major="${previous_tag%%\.*}"
-          previous_minor="${previous_tag#*.}"
-          previous_minor="${previous_minor%.*}"
-          previous_patch="${previous_tag##*.}"
-
-          # Determine next release tag
-          next_major_minor="$(date +'%Y').$(date +'%-m')"
-          if [[ "${previous_major}.${previous_minor}" == "${next_major_minor}" ]]; then
-              echo "Month release already exists for year, incrementing patch number by 1"
-              next_patch="$((previous_patch + 1))"
-          else
-              echo "Month release does not exist for year, setting patch number to 0"
-              next_patch="0"
-          fi
-          release_tag="${next_major_minor}.${next_patch}"
-
-          # Create release
-          gh release create "${release_tag}" \
-              --repo="${GITHUB_REPOSITORY}" \
-              --title="${release_tag}" \
-              --generate-notes
+          GITHUB_TOKEN: "${{ steps.app-token.outputs.token }}"
+        run: npx semantic-release
