@@ -1,0 +1,6 @@
+---
+- name: Create a new VM
+  ansible.builtin.command: qm create {{ proxmox_cloudbuntu_vmid }} --name {{ proxmox_cloudbuntu_name }}
+  args:
+    creates: "/etc/pve/qemu-server/{{ proxmox_cloudbuntu_vmid }}.conf"
+  register: __vm_create__

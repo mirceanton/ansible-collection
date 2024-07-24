@@ -1,0 +1,5 @@
+---
+proxmox_driver_blacklist:
+  - nvidia
+  - nouveau
+  - radeon

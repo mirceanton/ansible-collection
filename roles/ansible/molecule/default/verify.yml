@@ -1,0 +1,30 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  vars_files:
+    - ../../defaults/main.yml
+    - ../../vars/main.yml
+
+  pre_tasks:
+    - name: Check packages
+      package_facts:
+        manager: auto
+
+  tasks:
+    - name: Check if prerequisites are installed
+      ansible.builtin.assert:
+        that: "'{{ item }}' in ansible_facts.packages"
+      loop: "{{ ansible_apt_prereq }}"
+
+    - name: Check if commands are working
+      ansible.builtin.command: "{{ item }} --version"
+      register: __command__
+      changed_when: false
+      loop:
+        - "{{ ansible_pip_package }}"
+        - "{{ ansible_lint_package }}"
+        - "{{ ansible_molecule_package }}"

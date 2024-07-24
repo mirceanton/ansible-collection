@@ -1,0 +1,3 @@
+---
+# The path at which the theme installer should be saved
+proxmox_dark_theme_dest: /opt/PveDiscordDark.sh
