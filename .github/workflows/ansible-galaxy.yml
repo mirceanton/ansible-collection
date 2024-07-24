@@ -1,0 +1,47 @@
+---
+name: Publish role to Galaxy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        role:
+          - anacron
+          - ansible
+          - docker
+          - downloader
+          - opnsense-dashboard
+          - opnsense-dhcp
+          - opnsense-firewall_rules
+          - opnsense-gateway
+          - opnsense-general-settings
+          - opnsense-interfaces
+          - opnsense-plugins
+          - opnsense-ssh
+          - opnsense-theme
+          - opnsense-unbound
+          - proxmox-cloudbuntu
+          - proxmox-dark-theme
+          - proxmox-driver-blacklist
+          - proxmox-iommu
+          - proxmox-nested-virt
+          - proxmox-no-subscription
+          - proxmox-pci-passthrough
+          - proxmox-vfio
+          - proxmox-vgpu
+          - rust
+
+    steps:
+      - name: Check out Repository
+        uses: actions/checkout@v2
+
+      - name: Publish role to Ansible Galaxy
+        uses: robertdebock/galaxy-action@1.2.0
+        with:
+          galaxy_api_key: ${{ secrets.ANSIBLE_GALAXY_API_KEY }}
+          path: role/${{ matrix.role }}
